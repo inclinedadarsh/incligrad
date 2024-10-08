@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 class Value {
 public:
@@ -7,22 +8,39 @@ public:
   float grad;
   std::string op;
   std::string label;
+  std::vector<Value *> prev;
 
   /* Constructor starts */
   /* Constructor for value object without labels */
-  Value(float d) {
-    this->data = d;
+  Value(float data) {
+    this->data = data;
     this->label = "";
     this->grad = 0;
     this->op = "";
   }
 
+  Value(float data, std::vector<Value *> prev) {
+    this->data = data;
+    this->label = "";
+    this->grad = 0;
+    this->op = "";
+    this->prev = prev;
+  }
+
   /* Constructor for value object with labels */
-  Value(float d, std::string l) {
-    this->data = d;
+  Value(float data, std::string l) {
+    this->data = data;
     this->label = l;
     this->grad = 0;
     this->op = "";
+  }
+
+  Value(float data, std::string l, std::vector<Value *> prev) {
+    this->data = data;
+    this->label = l;
+    this->grad = 0;
+    this->op = "";
+    this->prev = prev;
   }
   /* Constructor ends */
 
@@ -46,17 +64,67 @@ public:
 
   /* General operators overloaded */
   /* Addition */
+  /* Addition of two objects */
   Value *operator+(Value const &other) {
     Value *out = new Value(this->data + other.data);
     return out;
   }
 
+  /* Addition of an object and an integer */
+  Value *operator+(int other) {
+    Value *out = new Value(this->data + other);
+    return out;
+  }
+
+  /* Addition of an object and an float */
+  Value *operator+(float other) {
+    Value *out = new Value(this->data + other);
+    return out;
+  }
+
   /* Multiplication */
+  /* Multiplication of two objects */
   Value *operator*(Value const &other) {
     Value *out = new Value(this->data * other.data);
     return out;
   }
+
+  /* Multiplication of an object and an integer */
+  Value *operator*(int other) {
+    Value *out = new Value(this->data * other);
+    return out;
+  }
+
+  /* Multiplication of an object and an float */
+  Value *operator*(float other) {
+    Value *out = new Value(this->data * other);
+    return out;
+  }
 };
+
+/* Addition of an integer and an object */
+Value *operator+(int other, const Value &self) {
+  Value *out = new Value(self.data + other);
+  return out;
+}
+
+/* Addition of an integer and an object */
+Value *operator+(float other, const Value &self) {
+  Value *out = new Value(self.data + other);
+  return out;
+}
+
+/* Addition of an integer and an object */
+Value *operator*(int other, const Value &self) {
+  Value *out = new Value(self.data * other);
+  return out;
+}
+
+/* Addition of an integer and an object */
+Value *operator*(float other, const Value &self) {
+  Value *out = new Value(self.data * other);
+  return out;
+}
 
 int main(void) {
   Value *a = new Value(2., "a");
@@ -66,7 +134,9 @@ int main(void) {
   Value *d = new Value(10., "d");
   Value *e = *d * *c;
   e->label = "e";
+  Value *f = 3.5f + *e;
+  Value *g = *f * 2;
 
-  std::cout << *e;
+  std::cout << *g;
   return 0;
 }
