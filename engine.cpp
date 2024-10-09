@@ -68,14 +68,16 @@ public:
     /*  throw std::invalid_argument("Cannot add null arugment\n");*/
     /*}*/
     Value *out = new Value(this->data * other.data, "", "*", {this, &other});
+    out->_backward = [this, &other, out]() {
+      this->grad += other.data * out->grad;
+      other.grad += this->data * out->grad;
+    };
     return out;
   }
 
   Value *operator*(float other) {
     Value *other_obj = new Value(other, "", "", {this});
-    Value *out =
-        new Value(this->data * other_obj->data, "", "*", {this, other_obj});
-    return out;
+    return *this * *other_obj;
   }
 };
 
@@ -90,7 +92,7 @@ int main(void) {
   Value *a = new Value(2.0);
   Value *b = new Value(3.0);
 
-  Value *c = *a + *b;
+  Value *c = *a * *b;
   c->label = "c";
 
   std::cout << "c: " << c->data << std::endl;
