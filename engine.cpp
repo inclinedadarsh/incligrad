@@ -1,7 +1,6 @@
 #include <cmath>
-#include <iostream>
-/*#include <stdexcept>*/
 #include <functional>
+#include <iostream>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -20,9 +19,7 @@ public:
         std::vector<Value *> prev = {})
       : data(data), label(label), op(""), grad(0), prev(prev) {
 
-    this->_backward = [this]() {
-
-    };
+    this->_backward = [this]() {};
   }
   /* Constructor ends */
 
@@ -47,15 +44,7 @@ public:
   /* General operators overloaded */
   /* Addition */
   Value *operator+(Value &other) {
-    /*if (other == nullptr) {*/
-    /*  throw std::invalid_argument("Cannot add null arugment\n");*/
-    /*}*/
     Value *out = new Value(this->data + other.data, "", "+", {this, &other});
-    /*void _backward() {*/
-    /*  this->grad = 1 * out->grad;*/
-    /*  this->data = 1 * out->grad;*/
-    /*}*/
-    /*out->backward = _backward;*/
     out->_backward = [this, &other, out]() {
       this->grad += 1 * out->grad;
       other.grad += 1 * out->grad;
@@ -70,9 +59,6 @@ public:
 
   /* Multiplication */
   Value *operator*(Value &other) {
-    /*if (other == nullptr) {*/
-    /*  throw std::invalid_argument("Cannot add null arugment\n");*/
-    /*}*/
     Value *out = new Value(this->data * other.data, "", "*", {this, &other});
     out->_backward = [this, &other, out]() {
       this->grad += other.data * out->grad;
@@ -86,6 +72,7 @@ public:
     return *this * *other_obj;
   }
 
+  /* Backward function */
   void backward() {
     std::vector<Value *> topo;
     std::unordered_set<Value *> visited;
@@ -110,13 +97,6 @@ private:
     }
   }
 };
-
-/*Value *operator+(Value *lhs, Value *rhs) {*/
-/*  if (lhs == nullptr) {*/
-/*    throw std::invalid_argument("Left-hand side cannot be null\n");*/
-/*  }*/
-/*  return lhs->operator+(rhs);*/
-/*}*/
 
 int main(void) {
   Value *a = new Value(2.0, "a");
