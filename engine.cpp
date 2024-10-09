@@ -1,4 +1,6 @@
+#include <cmath>
 #include <iostream>
+/*#include <stdexcept>*/
 #include <string>
 #include <vector>
 
@@ -11,37 +13,9 @@ public:
   std::vector<Value *> prev;
 
   /* Constructor starts */
-  /* Constructor for value object without labels */
-  Value(float data) {
-    this->data = data;
-    this->label = "";
-    this->grad = 0;
-    this->op = "";
-  }
-
-  Value(float data, std::vector<Value *> prev) {
-    this->data = data;
-    this->label = "";
-    this->grad = 0;
-    this->op = "";
-    this->prev = prev;
-  }
-
-  /* Constructor for value object with labels */
-  Value(float data, std::string l) {
-    this->data = data;
-    this->label = l;
-    this->grad = 0;
-    this->op = "";
-  }
-
-  Value(float data, std::string l, std::vector<Value *> prev) {
-    this->data = data;
-    this->label = l;
-    this->grad = 0;
-    this->op = "";
-    this->prev = prev;
-  }
+  Value(float data, std::string label = "", std::string op = "",
+        std::vector<Value *> prev = {})
+      : data(data), label(label), op(""), grad(0), prev(prev) {}
   /* Constructor ends */
 
   /* Methods for printing objects using std::cout */
@@ -64,79 +38,61 @@ public:
 
   /* General operators overloaded */
   /* Addition */
-  /* Addition of two objects */
-  Value *operator+(Value const &other) {
-    Value *out = new Value(this->data + other.data);
+  Value *operator+(Value &other) {
+    /*if (other == nullptr) {*/
+    /*  throw std::invalid_argument("Cannot add null arugment\n");*/
+    /*}*/
+    Value *out = new Value(this->data + other.data, "", "+", {this, &other});
     return out;
   }
 
-  /* Addition of an object and an integer */
-  Value *operator+(int other) {
-    Value *out = new Value(this->data + other);
-    return out;
-  }
-
-  /* Addition of an object and an float */
   Value *operator+(float other) {
-    Value *out = new Value(this->data + other);
+    Value *other_obj = new Value(other, "", "", {this});
+    Value *out =
+        new Value(this->data + other_obj->data, "", "+", {this, other_obj});
     return out;
   }
 
   /* Multiplication */
-  /* Multiplication of two objects */
-  Value *operator*(Value const &other) {
-    Value *out = new Value(this->data * other.data);
+  Value *operator*(Value &other) {
+    /*if (other == nullptr) {*/
+    /*  throw std::invalid_argument("Cannot add null arugment\n");*/
+    /*}*/
+    Value *out = new Value(this->data * other.data, "", "*", {this, &other});
     return out;
   }
 
-  /* Multiplication of an object and an integer */
-  Value *operator*(int other) {
-    Value *out = new Value(this->data * other);
-    return out;
-  }
-
-  /* Multiplication of an object and an float */
   Value *operator*(float other) {
-    Value *out = new Value(this->data * other);
+    Value *other_obj = new Value(other, "", "", {this});
+    Value *out =
+        new Value(this->data * other_obj->data, "", "*", {this, other_obj});
     return out;
   }
 };
 
-/* Addition of an integer and an object */
-Value *operator+(int other, const Value &self) {
-  Value *out = new Value(self.data + other);
-  return out;
-}
-
-/* Addition of an integer and an object */
-Value *operator+(float other, const Value &self) {
-  Value *out = new Value(self.data + other);
-  return out;
-}
-
-/* Addition of an integer and an object */
-Value *operator*(int other, const Value &self) {
-  Value *out = new Value(self.data * other);
-  return out;
-}
-
-/* Addition of an integer and an object */
-Value *operator*(float other, const Value &self) {
-  Value *out = new Value(self.data * other);
-  return out;
-}
+/*Value *operator+(Value *lhs, Value *rhs) {*/
+/*  if (lhs == nullptr) {*/
+/*    throw std::invalid_argument("Left-hand side cannot be null\n");*/
+/*  }*/
+/*  return lhs->operator+(rhs);*/
+/*}*/
 
 int main(void) {
-  Value *a = new Value(2., "a");
-  Value *b = new Value(3., "b");
+  Value *a = new Value(2.0);
+  Value *b = new Value(3.0);
+
   Value *c = *a + *b;
   c->label = "c";
+
   Value *d = new Value(10., "d");
   Value *e = *d * *c;
   e->label = "e";
-  Value *f = 3.5f + *e;
-  Value *g = *f * 2;
 
-  std::cout << *g;
+  Value *f = *e + 3.5f;
+  f->label = "f";
+
+  Value *g = *f * 2;
+  g->label = "g";
+
   return 0;
 }
