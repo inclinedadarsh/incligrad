@@ -3,6 +3,7 @@
 /*#include <stdexcept>*/
 #include <functional>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 class Value {
@@ -17,7 +18,12 @@ public:
   /* Constructor starts */
   Value(float data, std::string label = "", std::string op = "",
         std::vector<Value *> prev = {})
-      : data(data), label(label), op(""), grad(0), prev(prev) {}
+      : data(data), label(label), op(""), grad(0), prev(prev) {
+
+    this->_backward = [this]() {
+
+    };
+  }
   /* Constructor ends */
 
   /* Methods for printing objects using std::cout */
@@ -79,6 +85,30 @@ public:
     Value *other_obj = new Value(other, "", "", {this});
     return *this * *other_obj;
   }
+
+  void backward() {
+    std::vector<Value *> topo;
+    std::unordered_set<Value *> visited;
+
+    build_topo(visited, this, topo);
+
+    this->grad = 1;
+    for (int i = topo.size() - 1; i >= 0; i--) {
+      topo[i]->_backward();
+    }
+  }
+
+private:
+  void build_topo(std::unordered_set<Value *> &visited, Value *v,
+                  std::vector<Value *> &topo) {
+    if (visited.find(v) == visited.end()) {
+      visited.insert(v);
+      for (int i = 0; i < v->prev.size(); i++) {
+        build_topo(visited, v->prev[i], topo);
+      }
+      topo.push_back(v);
+    }
+  }
 };
 
 /*Value *operator+(Value *lhs, Value *rhs) {*/
@@ -89,17 +119,21 @@ public:
 /*}*/
 
 int main(void) {
-  Value *a = new Value(2.0);
-  Value *b = new Value(3.0);
+  Value *a = new Value(2.0, "a");
+  Value *b = new Value(3.0, "b");
 
   Value *c = *a * *b;
   c->label = "c";
 
-  std::cout << "c: " << c->data << std::endl;
-  c->grad = 10;
-  c->_backward();
+  Value *d = new Value(-5.0, "d");
 
-  std::cout << "a grad: " << a->grad << std::endl;
+  Value *e = *c * *d;
+  e->label = "e";
+
+  e->backward();
+
+  std::cout << "Grad of a: " << a->grad << std::endl;
+  std::cout << "Grad of b: " << b->grad << std::endl;
 
   return 0;
 }
