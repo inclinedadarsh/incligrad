@@ -72,6 +72,24 @@ public:
     return *this * *other_obj;
   }
 
+  /* Power */
+  Value *pow(float other) {
+    std::string op = std::to_string(this->data) + "^" + std::to_string(other);
+    Value *out = new Value(std::pow(this->data, other), "", op, {this});
+    out->_backward = [this, other, out]() {
+      this->grad += other * std::pow(this->data, other - 1) * out->grad;
+    };
+    return out;
+  }
+
+  /* Dvision */
+  Value *operator/(Value &other) { return *this * *other.pow(-1); }
+
+  Value *operator/(float other) {
+    Value *other_obj = new Value(other, "", "", {this});
+    return *this / *other_obj;
+  }
+
   /* Negation */
   Value *operator-() { return *this * -1; }
 
