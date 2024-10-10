@@ -72,6 +72,9 @@ public:
     return *this * *other_obj;
   }
 
+  /* Negation */
+  Value *operator-() { return *this * -1; }
+
   /* Backward function */
   void backward() {
     std::vector<Value *> topo;
