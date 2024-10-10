@@ -96,6 +96,19 @@ public:
   /* Subtraction */
   Value *operator-(Value &other) { return *this + *(-other); }
 
+  /* Tanh */
+  Value *tanh() {
+    float n = this->data;
+    float t = (std::exp(2 * n) - 1) / (std::exp(2 * n) + 1);
+    Value *out = new Value(t, "", "tanh", {this});
+
+    out->_backward = [this, out, t]() {
+      this->grad += (1 - std::pow(t, 2)) * out->grad;
+    };
+
+    return out;
+  }
+
   /* Backward function */
   void backward() {
     std::vector<Value *> topo;
