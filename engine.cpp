@@ -75,6 +75,9 @@ public:
   /* Negation */
   Value *operator-() { return *this * -1; }
 
+  /* Subtraction */
+  Value *operator-(Value &other) { return *this + *(-other); }
+
   /* Backward function */
   void backward() {
     std::vector<Value *> topo;
@@ -105,7 +108,7 @@ int main(void) {
   Value *a = new Value(2.0, "a");
   Value *b = new Value(3.0, "b");
 
-  Value *c = *a * *b;
+  Value *c = *a - *b;
   c->label = "c";
 
   Value *d = new Value(-5.0, "d");
