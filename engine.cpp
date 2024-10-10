@@ -136,21 +136,36 @@ private:
 };
 
 int main(void) {
-  Value *a = new Value(2.0, "a");
-  Value *b = new Value(3.0, "b");
+  Value *x1 = new Value(2.0, "x1");
+  Value *x2 = new Value(0.0, "x2");
 
-  Value *c = *a - *b;
-  c->label = "c";
+  Value *w1 = new Value(-3.0, "w1");
+  Value *w2 = new Value(1.0, "w2");
 
-  Value *d = new Value(-5.0, "d");
+  Value *b = new Value(6.8813735870195432, "b");
 
-  Value *e = *c * *d;
-  e->label = "e";
+  Value *x1w1 = *x1 * *w1;
+  x1w1->label = "x1 * w1";
+  Value *x2w2 = *x2 * *w2;
+  x2w2->label = "x2 * w2";
 
-  e->backward();
+  Value *x1w1x2w2 = *x1w1 + *x2w2;
+  x1w1x2w2->label = "x1*w1 + x2*w2";
 
-  std::cout << "Grad of a: " << a->grad << std::endl;
-  std::cout << "Grad of b: " << b->grad << std::endl;
+  Value *n = *x1w1x2w2 + *b;
+  n->label = "n";
+
+  Value *o = n->tanh();
+  o->label = "o";
+
+  std::cout << "o data: " << o->data << std::endl;
+
+  o->backward();
+
+  std::cout << "x1 grad: " << x1->grad << std::endl;
+  std::cout << "x2 grad: " << x2->grad << std::endl;
+  std::cout << "w1 grad: " << w1->grad << std::endl;
+  std::cout << "w2 grad: " << w2->grad << std::endl;
 
   return 0;
 }
